@@ -93,7 +93,7 @@ public:
 };
 
 CustomClient::CustomClient() : m_socket(0), m_peer(), m_packetSize(0), m_messageCount(0)
-    , m_interval(0.0078)  {
+    , m_interval(1)  {
 	m_message = "Message from client: Hello Server!";
 }
 
@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
     nodes.Create(26); 
     
     PointToPointHelper p2p;
-    p2p.SetDeviceAttribute("DataRate", StringValue("100Mbps"));
+    p2p.SetDeviceAttribute("DataRate", StringValue("1Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("2ms"));
   
     // Create separate links
@@ -378,14 +378,14 @@ int main(int argc, char *argv[])
     server->Setup(port);
     nodes.Get(6)->AddApplication(server);
     server->SetStartTime(Seconds(1.0));
-    server->SetStopTime(Seconds(20.0));
+    server->SetStopTime(Seconds(10.0));
 
     // First TCP Client
     Ptr<CustomClient> client1 = CreateObject<CustomClient>();
     client1->Setup(InetSocketAddress(interfaces46.GetAddress(1), port), 1024);
     nodes.Get(22)->AddApplication(client1);
     client1->SetStartTime(Seconds(2.0));
-    client1->SetStopTime(Seconds(20.0));
+    client1->SetStopTime(Seconds(10.0));
 
     // Second TCP Client
     //Ptr<CustomClient> client2 = CreateObject<CustomClient>();
@@ -452,7 +452,7 @@ int main(int argc, char *argv[])
     anim.EnablePacketMetadata(true);
 
     // Run simulation
-    Simulator::Stop(Seconds(20.0));
+    Simulator::Stop(Seconds(10.0));
     Simulator::Run();
 
 
@@ -484,7 +484,7 @@ int main(int argc, char *argv[])
             flowCount++;
             
             // Calculate basic metrics
-            double throughput = i->second.rxBytes  / 
+            double throughput = (i->second.rxBytes +i->second.txBytes)/ 
                              (i->second.timeLastRxPacket.GetSeconds() - 
                               i->second.timeFirstTxPacket.GetSeconds()) / 1000;
             
